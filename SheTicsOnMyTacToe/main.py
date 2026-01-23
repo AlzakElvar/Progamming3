@@ -1,4 +1,5 @@
 import random as r
+import copy
 
 game_running = True
 
@@ -38,31 +39,32 @@ class Grid:
                     return True
         return False
 
-
 class Node:
-    def __init__(self, data):
+    def __init__(self, data:Grid):
         self.data = data
         self.turn = 0
         self.links = []
 
 class Tree:
-    def __init__(self, root:Grid):
-        self.root = Node(root)
+    def __init__(self, root:Node):
+        self.root = root
+        self.root.turn += 1
         self.eyes = Eyes(self.root)
+        self.temp = None
 
     def grow(self):
         for a in range(9):
-            if self.root.data.get_space(a) == 0:
-                temp = self.root.data
-                temp.place(a, (self.root.turn % 2))
-                self.root.links.append(Node(temp))
+            if self.root.data.get_space(a+1) == 0:
+                self.temp = copy.deepcopy(self.root.data)
+                self.temp.place(a+1, (self.root.turn % 2))
+                self.root.links.append(Node(self.temp))
 
     def loop(self):
         for i in self.root.links:
-            if i.links:
-                print(i.data)
-                for j in i.links:
-                    print(j.data)
+            for j in i.data.grid:
+                print(j)
+            print("\n")
+
 
 class Eyes:
     def __init__(self, grid):
@@ -182,7 +184,9 @@ if __name__ == '__main__':
             while not valid:
                 valid = g.place(r.randint(1, 9), 1)
         else:
-            pass
+            t = Tree(Node(Grid(g.grid)))
+            t.grow()
+            t.loop()
         #    g.min_max()
 
 
