@@ -1,3 +1,5 @@
+import random as r
+
 class GameManager:
     def __init__(self):
         self.score = 0
@@ -5,9 +7,26 @@ class GameManager:
 
     def calc_score(self):
         self.score = 0
+        aces = 0
+
+        ##For every card in hand
         for i in range(len(self.hand)):
-            self.score += 00
-GM = GameManager()
+            #Add rank to score
+            self.score += clamp(self.hand[i].rank, 10)
+
+            #Deal with aces later
+            if self.hand[i].rank == 0:
+                aces += 1
+        #Dealing with aces
+        for i in range(aces):
+            if self.score + 11 > 21: #If Bust
+                self.score += 1 #Only one
+            else:
+                self.score += 11 #11 if goated
+
+    def draw(self, deck):
+        self.hand.append(deck.pop(r.randint(0, len(deck))))
+
 
 class Card:
     def __init__(self, suit, rank):
@@ -40,26 +59,6 @@ class Card:
 
         return f"{rank} of {suit}"
 
-    def __add__(self, other):
-        if self.rank == 0 and not other.rank == 0:
-            if GM.score + 11 > 21:
-                return 1 + clamp(other.rank, 10)
-            else:
-                return 11 + clamp(other.rank, 10)
-
-        elif other.rank == 0 and not self.rank == 0:
-            if GM.score + 11 > 21:
-                return 1 + clamp(self.rank, 10)
-            else:
-                return 11 + clamp(self.rank, 10)
-
-        elif self.rank == 0 and other.rank == 0:
-            if GM.score + 12 > 21:
-                return 2
-            else:
-                return 12
-        return clamp(self.rank, 10) + clamp(other.rank, 10)
-
 
 
 class CustomerService:
@@ -72,11 +71,9 @@ def clamp(n, mmax):
     return n
 
 deck = []
+GM = GameManager()
 
 if __name__ == "__main__":
     for s in range(4):
         for r in range(14):
             deck.append(Card(s, r))
-
-
-
