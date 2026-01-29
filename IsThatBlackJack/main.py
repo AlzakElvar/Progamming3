@@ -1,11 +1,12 @@
 import random
+import os
 
 class GameManager:
-    def __init__(self):
+    def __init__(self, player):
         self.score = 0
         self.money = 5000
         self.bet = 0
-        self.hand = []
+        self.hand = player.hand
 
     def calc_score(self):
         self.score = 0
@@ -26,13 +27,14 @@ class GameManager:
             else:
                 self.score += 11 #11 if goated
 
-    def draw(self, deck):
-        self.hand.append(deck.pop( random.randint(0, len(deck))) ) # Pop a random entry from deck and add to hand.
 
-    def print_hand(self):
-        for i in self.hand:
-            print(str(i), end= ", ")
-        print("")
+    def print_UI(self, you, comp):
+        os.system('cls')
+        print("Computer's Hand: ")
+        comp.print_hand()
+
+
+
 
 #Self Explanatory
 class Card:
@@ -66,13 +68,33 @@ class Card:
 
         return f"{rank} of {suit}"
 
+class Player:
+    def __init__(self, id):
+        self.hand = []
+        self.id = id
+
+    def draw(self, deck):
+        self.hand.append(deck.pop(random.randint(0, len(deck) - 1)))  # Pop a random entry from deck and add to hand.
+
+    def print_hand(self):
+        if id == 0:
+            for i in self.hand:
+                print(str(i), end= ", ")
+            print("")
+        else:
+            for i in range(len(self.hand) -1):
+                print(self.hand[i], end=", ")
+                print("[X]")
+
 def clamp(n, mmax):
     if n > mmax:
         return mmax
     return n
 
 deck = []
-GM = GameManager()
+YOU = Player(0)
+COMP = Player(1)
+GM = GameManager(YOU)
 game_running = True
 
 if __name__ == "__main__":
@@ -91,11 +113,22 @@ if __name__ == "__main__":
             continue
 
         for i in range(2):
-            GM.draw(deck)
+            YOU.draw(deck)
         GM.calc_score()
 
+        os.system('cls')
         print("Your hand is: ", end="")
-        GM.print_hand()
+        YOU.print_hand()
         decide = input("Hit (h) or Stand (s)")
+
         while decide.lower() != "s":
+            YOU.draw(deck)
+            print("Your hand is: ", end="")
+            YOU.print_hand()
+
+            if GM.score > 21:
+                print("\nYou bust!")
+                GM.money -= GM.bet
+
             decide = input("Hit (h) or Stand (s)")
+
