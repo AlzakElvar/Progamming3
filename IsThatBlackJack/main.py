@@ -1,11 +1,12 @@
 import random
+import os
 
 class GameManager:
-    def __init__(self):
+    def __init__(self, player):
         self.score = 0
         self.money = 5000
         self.bet = 0
-        self.hand = []
+        self.hand = player.hand
 
     def calc_score(self):
         self.score = 0
@@ -25,14 +26,6 @@ class GameManager:
                 self.score += 1 #Only one
             else:
                 self.score += 11 #11 if goated
-
-    def draw(self, deck):
-        self.hand.append(deck.pop( random.randint(0, len(deck))) ) # Pop a random entry from deck and add to hand.
-
-    def print_hand(self):
-        for i in self.hand:
-            print(str(i), end= ", ")
-        print("")
 
 #Self Explanatory
 class Card:
@@ -66,19 +59,48 @@ class Card:
 
         return f"{rank} of {suit}"
 
+class Player:
+    def __init__(self, id):
+        self.hand = []
+        self.id = id
+
+    def draw(self, deck):
+        self.hand.append(deck.pop(random.randint(0, len(deck) - 1)))  # Pop a random entry from deck and add to hand.
+
+    def print_hand(self):
+        if self.id == 0:
+            for i in self.hand:
+                print(str(i), end= ", ")
+            print("")
+        else:
+            for i in range(len(self.hand) -1):
+                print(self.hand[i], end=", ")
+                print("[X]")
+
 def clamp(n, mmax):
     if n > mmax:
         return mmax
     return n
 
+def print_UI(you, comp):
+    os.system('cls')
+    print("Computer's Hand: ")
+    comp.print_hand()
+    print("\nYour Hand: ")
+    you.print_hand()
+
 deck = []
-GM = GameManager()
+YOU = Player(0)
+COMP = Player(1)
+GM = GameManager(YOU)
+EVIL_GM = GameManager(COMP)
 game_running = True
 
 if __name__ == "__main__":
     for s in range(4):
         for r in range(14):
-            deck.append(Card(s, r))
+            if r != 1:
+                deck.append(Card(s, r))
 
     while game_running:
         print(f"Your balance is {GM.money}")
@@ -91,11 +113,37 @@ if __name__ == "__main__":
             continue
 
         for i in range(2):
-            GM.draw(deck)
-        GM.calc_score()
+            YOU.draw(deck)
+            COMP.draw(deck)
 
-        print("Your hand is: ", end="")
-        GM.print_hand()
-        decide = input("Hit (h) or Stand (s)")
+        print_UI(YOU, COMP)
+        decide = input("Hit (h) or Stand (s)? ")
+
         while decide.lower() != "s":
+            YOU.draw(deck)
+            print_UI(YOU, COMP)
+
+            GM.calc_score()
+            if GM.score > 21:
+                print("\nYou bust!")
+                GM.money -= GM.bet
+                break
+
             decide = input("Hit (h) or Stand (s)")
+
+        EVIL_GM.calc_score()
+        while EVIL_GM.score < 17:
+            COMP.draw(deck)
+            EVIL_GM.calc_score()
+
+        os.system('cls')
+        print("The Computer's Hand was: ", end="")
+        COMP.print_hand()
+        print(f"With a score of {EVIL_GM.score}")
+
+        if EVIL_GM.score > GM.score:
+            input("You Lost (enter to continue)")
+        elif EVIL_GM.score < GM.score:
+            pass
+        else:
+            pass
