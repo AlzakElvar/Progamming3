@@ -14,7 +14,7 @@ class GameManager:
         ##For every card in hand
         for i in range(len(self.hand)):
             #Add rank to score
-            self.score += clamp(self.hand[i].rank, 10)
+            self.score += clamp(self.hand[i].rank, 10) #Clamp is because the rank for Queens is 12, but they only give 10 points
 
             #Deal with aces later
             if self.hand[i].rank == 0:
@@ -34,14 +34,14 @@ class GameManager:
             print(str(i), end= ", ")
         print("")
 
-
+#Self Explanatory
 class Card:
     def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
 
-    def __str__(self):
-        suit = ""
+    def __str__(self): # This is a str() override, so to call it you would have to do str( Card() )
+        suit = ""      # See print_hand() for example
         rank = ""
 
         if self.suit == 0:
@@ -66,11 +66,6 @@ class Card:
 
         return f"{rank} of {suit}"
 
-
-class CustomerService:
-    def __init__(self):
-        pass
-
 def clamp(n, mmax):
     if n > mmax:
         return mmax
@@ -78,14 +73,29 @@ def clamp(n, mmax):
 
 deck = []
 GM = GameManager()
+game_running = True
 
 if __name__ == "__main__":
     for s in range(4):
         for r in range(14):
             deck.append(Card(s, r))
 
-    GM.draw(deck)
-    GM.draw(deck)
-    GM.calc_score()
-    GM.print_hand()
-    print(GM.score)
+    while game_running:
+        print(f"Your balance is {GM.money}")
+        # Protection from strings in the bet window
+        try:
+            bet = int(input("Please enter a bet: "))
+            GM.bet = bet
+        except ValueError:
+            print("\nPlease enter a valid number \n")
+            continue
+
+        for i in range(2):
+            GM.draw(deck)
+        GM.calc_score()
+
+        print("Your hand is: ", end="")
+        GM.print_hand()
+        decide = input("Hit (h) or Stand (s)")
+        while decide.lower() != "s":
+            decide = input("Hit (h) or Stand (s)")
