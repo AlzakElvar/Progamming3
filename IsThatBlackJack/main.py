@@ -160,7 +160,7 @@ if __name__ == "__main__":
             GM.money += GM.bet
             print(f"The Computer's hand was: ", end="")
             COMP.print_hand()
-            print(f"Computer Busts! \nYour new balance is ${GM.money}")
+            input(f"Computer Busts! \nYour new balance is ${GM.money}")
             os.system('cls')
             continue
 
