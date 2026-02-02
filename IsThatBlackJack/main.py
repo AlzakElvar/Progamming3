@@ -156,10 +156,12 @@ if __name__ == "__main__":
 
         COMP.id = 0
 
-        if EVIL_GM.score > 21: #Did the computer bust?
+        if EVIL_GM.score > 21: #TRUE if computer busts
+            os.system('cls')
             GM.money += GM.bet
             print(f"The Computer's hand was: ", end="")
             COMP.print_hand()
+            print(f"With a score of: {EVIL_GM.score}")
             input(f"Computer Busts! \nYour new balance is ${GM.money}")
             os.system('cls')
             continue
