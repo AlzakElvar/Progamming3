@@ -75,7 +75,7 @@ class Player:
             for i in self.hand:
                 print(str(i), end= ", ")
             print("")
-        else:
+        else: #ID 1 is so that the computer doesn't reveal its entire hand
             for i in range(len(self.hand) -1):
                 print(self.hand[i], end=", ")
                 print("[X]")
@@ -101,7 +101,6 @@ YOU = Player(0)
 COMP = Player(1)
 GM = GameManager(YOU)
 EVIL_GM = GameManager(COMP)
-game_running = True
 
 if __name__ == "__main__":
     for s in range(4):
@@ -132,7 +131,7 @@ if __name__ == "__main__":
         print_UI(YOU, COMP)
         decide = input("Hit (h) or Stand (s)? ")
 
-        while decide.lower() != "s":
+        while decide.lower() != "s" and decide != "1": #The 'decide != 1' is just for me :)
             YOU.draw(deck)
             print_UI(YOU, COMP)
 
@@ -154,7 +153,7 @@ if __name__ == "__main__":
             COMP.draw(deck)
             EVIL_GM.calc_score()
 
-        COMP.id = 0
+        COMP.id = 0 # ID 0 so the computer shows its whole hand
 
         if EVIL_GM.score > 21: #TRUE if computer busts
             os.system('cls')
