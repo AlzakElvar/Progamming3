@@ -27,6 +27,10 @@ class GameManager:
             else:
                 self.score += 11 #11 if goated
 
+    def reset(self):
+        self.hand = []
+        self.score = 0
+
 #Self Explanatory
 class Card:
     def __init__(self, suit, rank):
@@ -89,6 +93,7 @@ def print_UI(you, comp):
     print("\nYour Hand: ")
     you.print_hand()
 
+DECK = []
 deck = []
 YOU = Player(0)
 COMP = Player(1)
@@ -100,9 +105,10 @@ if __name__ == "__main__":
     for s in range(4):
         for r in range(14):
             if r != 1:
-                deck.append(Card(s, r))
+                DECK.append(Card(s, r))
 
     while game_running:
+        deck = DECK
         print(f"Your balance is {GM.money}")
         # Protection from strings in the bet window
         try:
@@ -124,26 +130,43 @@ if __name__ == "__main__":
             print_UI(YOU, COMP)
 
             GM.calc_score()
-            if GM.score > 21:
-                print("\nYou bust!")
+            if GM.score > 21: #Bust ensurance
                 GM.money -= GM.bet
+                input(f"\nYou bust! \nYour new balance is ${GM.money} (enter to continue)")
                 break
 
             decide = input("Hit (h) or Stand (s)")
 
+        GM.calc_score()
         EVIL_GM.calc_score()
-        while EVIL_GM.score < 17:
+        while EVIL_GM.score < 17: #Draw until the comp has a score of at least 17
             COMP.draw(deck)
             EVIL_GM.calc_score()
+
+        COMP.id = 0
+
+        if EVIL_GM.score > 21: #Did the computer bust?
+            GM.money += GM.bet
+            print(f"The Computer's hand was: ", end="")
+            COMP.print_hand()
+            print(f"Computer Busts! \nYour new balance is ${GM.money}")
+            continue
 
         os.system('cls')
         print("The Computer's Hand was: ", end="")
         COMP.print_hand()
         print(f"With a score of {EVIL_GM.score}")
 
+        print("\n Your hand was ", end="")
+        print(f"With a score of {GM.score }GM.score")
+        YOU.print_hand()
+
         if EVIL_GM.score > GM.score:
-            input("You Lost (enter to continue)")
+            GM.money -= GM.bet
+            input(f"You Lost. \nYour new balance is ${GM.money} (enter to continue)")
         elif EVIL_GM.score < GM.score:
-            pass
+            GM.money += GM.bet
+            input(f"You Won!. \nYour new balance is ${GM.money} (enter to continue)")
         else:
-            pass
+            input(f"It was a tie. \nYour balance is ${GM.money} (enter to continue)")
+        os.system('cls')
