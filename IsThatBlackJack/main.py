@@ -6,9 +6,11 @@ class GameManager:
         self.score = 0
         self.money = 5000
         self.bet = 0
-        self.hand = player.hand
+        self.player = player
+        self.hand = []
 
     def calc_score(self):
+        self.hand = self.player.hand
         self.score = 0
         aces = 0
 
@@ -27,9 +29,6 @@ class GameManager:
             else:
                 self.score += 11 #11 if goated
 
-    def reset(self):
-        self.hand = []
-        self.score = 0
 
 #Self Explanatory
 class Card:
@@ -81,6 +80,9 @@ class Player:
                 print(self.hand[i], end=", ")
                 print("[X]")
 
+    def reset(self):
+        self.hand = []
+
 def clamp(n, mmax):
     if n > mmax:
         return mmax
@@ -93,7 +95,7 @@ def print_UI(you, comp):
     print("\nYour Hand: ")
     you.print_hand()
 
-DECK = []
+p_deck = []
 deck = []
 YOU = Player(0)
 COMP = Player(1)
@@ -105,10 +107,15 @@ if __name__ == "__main__":
     for s in range(4):
         for r in range(14):
             if r != 1:
-                DECK.append(Card(s, r))
+                p_deck.append(Card(s, r))
 
-    while game_running:
-        deck = DECK
+    while True:
+        if GM.money <= 0:
+            break
+
+        deck = p_deck
+        YOU.reset()
+        COMP.reset()
         print(f"Your balance is {GM.money}")
         # Protection from strings in the bet window
         try:
@@ -137,6 +144,10 @@ if __name__ == "__main__":
 
             decide = input("Hit (h) or Stand (s)")
 
+        if GM.score > 21:
+            os.system('cls')
+            continue
+
         GM.calc_score()
         EVIL_GM.calc_score()
         while EVIL_GM.score < 17: #Draw until the comp has a score of at least 17
@@ -152,14 +163,15 @@ if __name__ == "__main__":
             print(f"Computer Busts! \nYour new balance is ${GM.money}")
             continue
 
+
         os.system('cls')
         print("The Computer's Hand was: ", end="")
         COMP.print_hand()
         print(f"With a score of {EVIL_GM.score}")
 
-        print("\n Your hand was ", end="")
-        print(f"With a score of {GM.score }GM.score")
+        print("\nYour hand was ", end="")
         YOU.print_hand()
+        print(f"With a score of {GM.score}")
 
         if EVIL_GM.score > GM.score:
             GM.money -= GM.bet
