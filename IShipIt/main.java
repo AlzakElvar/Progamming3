@@ -2,22 +2,24 @@ import java.util.Scanner;
 
 class Main {
     public static void main(String[] args) {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
         CustomerService cs = new CustomerService();
-        cs.Place(6);
+        int[] lengths = {5, 4, 3, 3, 2};
+        for (int len : lengths){
+            cs.Place(len);
+        }
 
     }
 }
-// panel1.printGrid();
-
-// System.out.print("Please plink: ");
-// String plonk = scanner.nextLine();
-// panel1.plink(plonk);
-
-// panel1.printGrid();
 
 class Grid {
     
     char[][] grid = new char[10][10];
+    char[] key = {
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h','i', 'j'
+    };
 
     public Grid(){
        
@@ -30,8 +32,18 @@ class Grid {
     
     public void printGrid() {
         
-        for (char[] row : grid) {
-            for (char col : row) {
+        System.out.print("   ");
+        for (int i = 0; i < 10; i++){
+            System.out.print(i + "  ");
+        }
+        System.out.print("\n ");
+        for (int i = 0; i < 30; i++){
+            System.out.print("-");
+        }
+        System.out.print("\n");
+        for (int i = 0; i < grid.length; i++) {
+            System.out.print(key[i] + "| ");
+            for (char col : grid[i]) {
 
                 System.out.print(col + "  ");
 
@@ -46,10 +58,7 @@ class Grid {
         }
     }
 
-    public int getCollumn(char arg) {
-        char[] key = {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h','i', 'j'
-        };
+    public int getRow(char arg) {
         
         int answer = -1;
         
@@ -64,14 +73,19 @@ class Grid {
 
 
     // Will take a String of XA: where X is any letter between A - J and A is any number between 1 - 10
-    
+    /**
+     * Will take a String of XA: where X is any letter between A - J and A is any number between 1 - 10 
+     * @param args - the position in XA
+     * 
+     * @return 'O' or '[' or 'X'. Depending on Miss, Hit, or other
+     */
     public char plink(String args) {
         char a = args.charAt(0);
         int b = Integer.parseInt( Character.toString(args.charAt(1)) );
         
-        int c = getCollumn(a);
+        int c = getRow(a);
         
-        char temp = grid[b][c];
+        char temp = grid[c][b];
         if (temp == '0') {
             return 'O';
         } 
@@ -86,20 +100,20 @@ class Grid {
     public Boolean Set(String pos, int len, int rot){
         char a = pos.charAt(0);
         int b = Integer.parseInt( Character.toString(pos.charAt(1)) );
-        int c = getCollumn(a);
+        int c = getRow(a);
 
         for (int i = 0; i < len; i++){
             if(rot == 0){
-                if (grid[b + i-1][c] != '█'){
-                    grid[b + i-1][c] = '█';
+                if (grid[c + i][b] != '█'){
+                    grid[c + i][b] = '█';
                 } 
                 else {
                     return false;
                 }
             }
             else {
-                if (grid[b][c + i] != '█'){
-                    grid[b][c + i] = '█';
+                if (grid[c][b + i] != '█'){
+                    grid[c][b + i] = '█';
                 }
                 else {
                     return false;
@@ -118,6 +132,7 @@ class CustomerService {
     Grid plank1 = new Grid();
     Grid panel2 = new Grid();
     Grid plank2 = new Grid();
+    Scanner scanner = new Scanner(System.in);
     
     
     public void Plink() {
@@ -132,17 +147,25 @@ class CustomerService {
         scanner.close();
     }
 
-    public void Place(int len) {
-        Scanner scanner = new Scanner(System.in);
+    public boolean Place(int len) {
+        ClearScreen.Clear();
 
         plank1.printGrid();
         System.out.print("Please Choose a postion for the " + len + "-len ship: ");
         String place = scanner.nextLine();
         System.out.print("Please select a rotation(0 or 90): ");
         String rot = scanner.nextLine();
-        plank1.Set(place, len, Integer.parseInt(rot));    
+        boolean temp = plank1.Set(place, len, Integer.parseInt(rot));    
         
         plank1.printGrid();
-        scanner.close();
+
+        return temp;
+    }
+}
+
+class ClearScreen{
+    public static void Clear(){
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
     }
 }
