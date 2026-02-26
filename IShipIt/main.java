@@ -2,19 +2,18 @@ import java.util.Scanner;
 
 class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Grid board = new Grid();
-        board.printGrid();
+        CustomerService cs = new CustomerService();
+        cs.Place(6);
 
-        System.out.print("Please plink: ");
-        String plonk = scanner.nextLine();
-        board.plink(plonk);
-
-        board.printGrid();
-
-        scanner.close();
     }
 }
+// panel1.printGrid();
+
+// System.out.print("Please plink: ");
+// String plonk = scanner.nextLine();
+// panel1.plink(plonk);
+
+// panel1.printGrid();
 
 class Grid {
     
@@ -66,12 +65,84 @@ class Grid {
 
     // Will take a String of XA: where X is any letter between A - J and A is any number between 1 - 10
     
-    public void plink(String args) {
+    public char plink(String args) {
         char a = args.charAt(0);
         int b = Integer.parseInt( Character.toString(args.charAt(1)) );
         
         int c = getCollumn(a);
         
-        grid[b][c] = 'O';
+        char temp = grid[b][c];
+        if (temp == '0') {
+            return 'O';
+        } 
+        else if (temp == '█'){
+            return '[';
+        } 
+        else {
+            return 'X';
+        }
+    }
+
+    public Boolean Set(String pos, int len, int rot){
+        char a = pos.charAt(0);
+        int b = Integer.parseInt( Character.toString(pos.charAt(1)) );
+        int c = getCollumn(a);
+
+        for (int i = 0; i < len; i++){
+            if(rot == 0){
+                if (grid[b + i-1][c] != '█'){
+                    grid[b + i-1][c] = '█';
+                } 
+                else {
+                    return false;
+                }
+            }
+            else {
+                if (grid[b][c + i] != '█'){
+                    grid[b][c + i] = '█';
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}
+
+class CustomerService {
+    
+    
+    Grid panel1 = new Grid();
+    Grid plank1 = new Grid();
+    Grid panel2 = new Grid();
+    Grid plank2 = new Grid();
+    
+    
+    public void Plink() {
+        Scanner scanner = new Scanner(System.in);
+        panel1.printGrid();
+
+        System.out.print("Please plink: ");
+        String plonk = scanner.nextLine();
+        panel1.plink(plonk);
+
+        panel1.printGrid();
+        scanner.close();
+    }
+
+    public void Place(int len) {
+        Scanner scanner = new Scanner(System.in);
+
+        plank1.printGrid();
+        System.out.print("Please Choose a postion for the " + len + "-len ship: ");
+        String place = scanner.nextLine();
+        System.out.print("Please select a rotation(0 or 90): ");
+        String rot = scanner.nextLine();
+        plank1.Set(place, len, Integer.parseInt(rot));    
+        
+        plank1.printGrid();
+        scanner.close();
     }
 }
