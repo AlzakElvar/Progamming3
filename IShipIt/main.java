@@ -1,25 +1,47 @@
 import java.util.Scanner;
 
 class Main {
+    
+    static int turn = 1;
     public static void main(String[] args) {
-        Player Person1 = new Player();
+        Player p1 = new Player();
+        Player p2 = new Player();
+        Player player = p1;
+        
+        for (int i = 0; i < 2; i ++){
+            
+            if (turn % 2 == 1){
+                player = p1;
+            }
+            else {
+                player = p2;
+            }
 
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+            SetUp(player);
+            Shift();
+        }
+    }
 
+    public static void SetUp(Player player) {
+        ClearScreen.Clear();
         CustomerService cs = new CustomerService();
         int[] lengths = {5, 4, 3, 3, 2};
         for (int i = 0; i < lengths.length; i++){
-            Ship temp = new Ship(cs.Place(lengths[i]));
-            Person1.ships[i] = temp;
+            Ship temp = new Ship(cs.Place(lengths[i], player));
+            player.ships[i] = temp;
         }
-        Person1.printShips();
+    }
 
+    public static void Shift() {
+        ClearScreen.Clear();
+        turn += 1;
     }
 }
 
 class Player {
     Ship[] ships = new Ship[5];
+    Grid panel = new Grid();
+    Grid plank = new Grid();
 
     public void printShips() {
         for(Ship ship : ships){
@@ -108,8 +130,7 @@ class Grid {
     }
 
 
-    // Will take a String of XA: where X is any letter between A - J and A is any number between 1 - 10
-    /**
+     /**
      * Will take a String of XA: where X is any letter between A - J and A is any number between 1 - 10 
      * @param args - the position in XA
      * 
@@ -165,38 +186,38 @@ class Grid {
 }
 
 class CustomerService {
-    
-    Grid panel1 = new Grid();
-    Grid plank1 = new Grid();
-    
-    Grid panel2 = new Grid();
-    Grid plank2 = new Grid();
+
     Scanner scanner = new Scanner(System.in);
     
+    /**
+     * Plink takes player input, then calls the plink() function from the board class 
+     * 
+     * @param player - Fexible for different turn orders
+     */
     
-    public void Plink() {
+    public void Plink(Player player) {
         Scanner scanner = new Scanner(System.in);
-        panel1.printGrid();
+        player.panel.printGrid();
 
         System.out.print("Please plink: ");
         String plonk = scanner.nextLine();
-        panel1.plink(plonk);
+        player.panel.plink(plonk);
 
-        panel1.printGrid();
+        player.panel.printGrid();
         scanner.close();
     }
 
-    public String[] Place(int len) {
+    public String[] Place(int len, Player player) {
         ClearScreen.Clear();
 
-        plank1.printGrid();
+        player.plank.printGrid();
         System.out.print("Please Choose a postion for the " + len + "-len ship: ");
         String place = scanner.nextLine();
         System.out.print("Please select a rotation(0 or 90): ");
         String rot = scanner.nextLine();
-        String[] temp = plank1.Set(place, len, Integer.parseInt(rot));    
+        String[] temp = player.plank.Set(place, len, Integer.parseInt(rot));    
         
-        plank1.printGrid();
+        player.plank.printGrid();
 
         return temp;
     }
