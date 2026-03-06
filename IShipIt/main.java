@@ -1,13 +1,15 @@
 import java.util.Scanner;
 
 class Main {
-    
+    static CustomerService cs = new CustomerService();
     static int turn = 1;
     public static void main(String[] args) {
         Player p1 = new Player();
         Player p2 = new Player();
         Player player = p1;
+        Player s_player = p2;
         
+        //Set up both boards
         for (int i = 0; i < 2; i ++){
             
             if (turn % 2 == 1){
@@ -20,11 +22,31 @@ class Main {
             SetUp(player);
             Shift();
         }
+
+        while (!p1.lost() || !p2.lost()){
+            
+            if (turn % 2 == 1){
+                player = p1;
+                s_player = p2;
+            }
+            else {
+                player = p2;
+                s_player = p1;
+            }
+
+            player.panel.printGrid();
+            player.plank.printGrid();
+            System.out.println(cs.Plink(s_player));
+            cs.paktoc();
+            Shift();
+            
+        }
+
     }
 
     public static void SetUp(Player player) {
         ClearScreen.Clear();
-        CustomerService cs = new CustomerService();
+        
         int[] lengths = {5, 4, 3, 3, 2};
         for (int i = 0; i < lengths.length; i++){
             Ship temp = new Ship(cs.Place(lengths[i], player));
@@ -34,8 +56,11 @@ class Main {
 
     public static void Shift() {
         ClearScreen.Clear();
+        System.out.println("TURN SHIFT");
+        cs.paktoc();
         turn += 1;
     }
+    
 }
 
 class Player {
@@ -47,6 +72,17 @@ class Player {
         for(Ship ship : ships){
             System.out.print(ship.length + " ");
         }
+    }
+
+    public boolean lost() {
+        for (Ship ship : ships){
+            
+            if (!ship.Sunk()) {
+                return false;    
+            }
+        
+        }
+        return true;
     }
 }
 
@@ -91,27 +127,24 @@ class Grid {
     public void printGrid() {
         
         System.out.print("   ");
+        
         for (int i = 0; i < 10; i++){
             System.out.print(i + "  ");
         }
         System.out.print("\n ");
+        
         for (int i = 0; i < 30; i++){
             System.out.print("-");
         }
         System.out.print("\n");
+
         for (int i = 0; i < grid.length; i++) {
             System.out.print(key[i] + "| ");
+            
             for (char col : grid[i]) {
-
-                System.out.print(col + "  ");
-
-                //     System.out.print("0  ")
-                //     System.out.print("O  ");
-                //     System.out.print("X  ");
-                //     System.out.print("█  ");        //3 means ship (unhit)
-                //     System.out.print("[ ");        //4 means ship (hit)
-                
+                System.out.print(col + "  ");    
             }
+
         System.out.print("\n");
         }
     }
@@ -195,16 +228,15 @@ class CustomerService {
      * @param player - Fexible for different turn orders
      */
     
-    public void Plink(Player player) {
-        Scanner scanner = new Scanner(System.in);
+    public char[] Plink(Player player) {
         player.panel.printGrid();
 
         System.out.print("Please plink: ");
         String plonk = scanner.nextLine();
-        player.panel.plink(plonk);
+        char temp = player.plank.plink(plonk);
 
         player.panel.printGrid();
-        scanner.close();
+        return new char[] {temp, plonk.charAt(0), plonk.charAt(1)};
     }
 
     public String[] Place(int len, Player player) {
@@ -220,6 +252,14 @@ class CustomerService {
         player.plank.printGrid();
 
         return temp;
+    }
+
+    /**
+     * Press Any Key TO Contiue
+     */
+    public void paktoc(){        
+        System.out.print("Press any key continue:");
+        String nothing = scanner.nextLine();
     }
 }
 
