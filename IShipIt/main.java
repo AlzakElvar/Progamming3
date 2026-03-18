@@ -294,7 +294,17 @@ class CustomerService {
 
         System.out.print("Please plink: ");
         String plonk = scanner.nextLine();
-        char temp = player.plank.plink(plonk);
+        boolean doTry = true;
+        char temp = 'O';
+
+        while (doTry) {
+            try {
+                temp = player.plank.plink(plonk);
+                doTry = false;
+            } catch (Exception e) {
+                System.out.print("Please do better");
+            }
+        }
 
         return new char[] {temp, plonk.charAt(0), plonk.charAt(1)};
     }
