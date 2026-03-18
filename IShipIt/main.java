@@ -33,10 +33,37 @@ class Main {
                 player = p2;
                 s_player = p1;
             }
-
+            
             player.panel.printGrid();
             player.plank.printGrid();
-            System.out.println(cs.Plink(s_player));
+                                                        //Deal with the Plinking
+            
+            char[] p_result = cs.Plink(s_player);
+            
+            if (p_result[0] == '[') {
+                int row = player.panel.getRow(p_result[1]);
+                int column = Integer.parseInt("" + p_result[2]);
+
+                player.panel.grid[row][column] = 'X';
+                s_player.plank.grid[row][column] = 'O';
+                                                        //Find Ship & Process hits
+//                System.out.println(" HIT ");
+                for (int i = 0; i < s_player.ships.length; i++) {
+
+                    for (int j = 0; j < s_player.ships[i].parts.length; j++) {
+                        System.out.println(s_player.ships[i].parts[j] + " " + row+column);
+                        System.out.println(s_player.ships[i].parts[j].equals ( ""+ row + column ));
+                        
+                        if (s_player.ships[i].parts[j].equals( "" + row + column)) {
+                            s_player.ships[i].parts[j] = "HIT";
+                            System.out.println(s_player.ships[i].length);
+                        }
+                    }
+                }
+            
+            } else if (p_result[0] == 'O') {
+                System.out.print(" MISS ");
+            }
             cs.paktoc();
             Shift();
             
@@ -149,6 +176,10 @@ class Grid {
         }
     }
 
+    /**
+     * @param letter a-j
+     * @return Int, row#
+     */
     public int getRow(char arg) {
         
         int answer = -1;
@@ -245,22 +276,30 @@ class CustomerService {
         player.plank.printGrid();
         System.out.print("Please Choose a postion for the " + len + "-len ship: ");
         String place = scanner.nextLine();
-        System.out.print("Please select a rotation(0 or 90): ");
-        String rot = scanner.nextLine();
+//        System.out.print("Please select a rotation(0 or 90): ");
+//        String rot = scanner.nextLine();
+        String rot = "0";
         String[] temp = player.plank.Set(place, len, Integer.parseInt(rot));    
         
         player.plank.printGrid();
+        for (String i : temp) {
+            System.out.print(i);
+        }
 
         return temp;
     }
 
     /**
-     * Press Any Key TO Contiue
+     * @Translation Press Any Key TO Contiue
      */
     public void paktoc(){        
         System.out.print("Press any key continue:");
         String nothing = scanner.nextLine();
+        if (nothing == "") {
+            return;
+        }
     }
+
 }
 
 class ClearScreen{
