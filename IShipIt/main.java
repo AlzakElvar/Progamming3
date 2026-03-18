@@ -23,6 +23,7 @@ class Main {
             Shift();
         }
 
+        GAME_RUNNING: //Oh I love labels
         while (!p1.lost() || !p2.lost()){
             
             if (turn % 2 == 1){
@@ -34,42 +35,67 @@ class Main {
                 s_player = p1;
             }
             
-            player.panel.printGrid();
             player.plank.printGrid();
+            player.panel.printGrid();
                                                         //Deal with the Plinking
             
             char[] p_result = cs.Plink(s_player);
             
-            if (p_result[0] == '[') {
+            while (p_result[0] == '[') {
                 int row = player.panel.getRow(p_result[1]);
                 int column = Integer.parseInt("" + p_result[2]);
 
                 player.panel.grid[row][column] = 'X';
-                s_player.plank.grid[row][column] = 'O';
+                s_player.plank.grid[row][column] = '[';
                                                         //Find Ship & Process hits
-//                System.out.println(" HIT ");
+                SEARCH: //Label
                 for (int i = 0; i < s_player.ships.length; i++) {
-
                     for (int j = 0; j < s_player.ships[i].parts.length; j++) {
-                        System.out.println(s_player.ships[i].parts[j] + " " + row+column);
-                        System.out.println(s_player.ships[i].parts[j].equals ( ""+ row + column ));
+                        
+                        System.out.println(s_player.ships[i].parts[j] + " " + row + column );
+                        System.out.println(s_player.ships[i].parts[j].equals ( "" + row + column ));
                         
                         if (s_player.ships[i].parts[j].equals( "" + row + column)) {
                             s_player.ships[i].parts[j] = "HIT";
-                            System.out.println(s_player.ships[i].length);
+                            System.out.println("HIT");
+                            break SEARCH;
                         }
                     }
                 }
+
+                player.plank.printGrid();
+                player.panel.printGrid();
+                p_result = cs.Plink(s_player);
             
-            } else if (p_result[0] == 'O') {
-                System.out.print(" MISS ");
+            } 
+            if (p_result[0] == 'O') {
+                System.out.println(" MISS ");
+                int row = player.panel.getRow(p_result[1]);
+                int column = Integer.parseInt("" + p_result[2]);
+
+                player.panel.grid[row][column] = 'O';
+                s_player.plank.grid[row][column] = '*';
             }
+
+            player.panel.printGrid();
             cs.paktoc();
+
+            if (p1.lost() || p2.lost()) {
+                break GAME_RUNNING;
+            }
+
             Shift();
             
         }
 
+        System.out.println("AND THAT'S A GAME!");
+        if (p1.lost()){
+            System.out.println("PLAYER 2 WINS");
+        } else {
+            System.out.println("PLAYER 1 WINS");
+        }
     }
+
 
     public static void SetUp(Player player) {
         ClearScreen.Clear();
@@ -129,7 +155,7 @@ class Ship {
                 return false;
             }
         }
-        
+        System.out.println("The " + length + "-long ship has been sunk");
         return true;
     }
 }
@@ -260,13 +286,11 @@ class CustomerService {
      */
     
     public char[] Plink(Player player) {
-        player.panel.printGrid();
 
         System.out.print("Please plink: ");
         String plonk = scanner.nextLine();
         char temp = player.plank.plink(plonk);
 
-        player.panel.printGrid();
         return new char[] {temp, plonk.charAt(0), plonk.charAt(1)};
     }
 
