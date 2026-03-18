@@ -24,7 +24,7 @@ class Main {
         }
 
         GAME_RUNNING: //Oh I love labels
-        while (!p1.lost() || !p2.lost()){
+        while (!p1.lost(1) || !p2.lost(1)){
             
             if (turn % 2 == 1){
                 player = p1;
@@ -65,6 +65,11 @@ class Main {
 
                 player.plank.printGrid();
                 player.panel.printGrid();
+                
+                if (p1.lost(0) || p2.lost(0)) {
+                    break GAME_RUNNING;
+                }
+                
                 p_result = cs.Plink(s_player);
             
             } 
@@ -80,16 +85,13 @@ class Main {
             player.panel.printGrid();
             cs.paktoc();
 
-            if (p1.lost() || p2.lost()) {
-                break GAME_RUNNING;
-            }
 
             Shift();
             
         }
 
         System.out.println("AND THAT'S A GAME!");
-        if (p1.lost()){
+        if (p1.lost(1)){
             System.out.println("PLAYER 2 WINS");
         } else {
             System.out.println("PLAYER 1 WINS");
@@ -127,10 +129,10 @@ class Player {
         }
     }
 
-    public boolean lost() {
+    public boolean lost(int doPrint) {
         for (Ship ship : ships){
             
-            if (!ship.Sunk()) {
+            if (!ship.Sunk(doPrint)) {
                 return false;    
             }
         
@@ -149,13 +151,16 @@ class Ship {
         length = pieces.length;
     }
 
-    public boolean Sunk() {
+    public boolean Sunk(int doPrint) {
         for (int i = 0; i < length; i++){
             if (parts[i] != "HIT") {
                 return false;
             }
         }
-        System.out.println("The " + length + "-long ship has been sunk");
+        if (doPrint == 0) {
+            System.out.println("The " + length + "-long ship has been sunk");
+        }
+
         return true;
     }
 }
