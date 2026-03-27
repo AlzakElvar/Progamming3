@@ -54,7 +54,14 @@ public class Main {
                 .build();
 
             response = client.send(request, asString);
-            System.out.println(response.body());
+            String[] fish = response.body().split(",");
+
+
+            for (String bone : fish) {
+                if (bone.contains("description") || bone.contains("temp\"")) {
+                    System.out.println(bone);
+                }
+            }
 
 
             System.out.print("Please enter a city (leave blank to close): ");
