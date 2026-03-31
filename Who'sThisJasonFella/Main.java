@@ -4,8 +4,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import java.util.Scanner;
-
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
     
@@ -19,9 +19,12 @@ public class Main {
     public static void latFromCity() throws java.io.IOException, InterruptedException {
 
         Scanner scanner = new Scanner(System.in);
+        Path outlet = Paths.get("response.JSON");
 
         System.out.print("Please enter a city (leave blank to close): ");
         String city = scanner.nextLine();
+
+        boolean path = true;
 
         while (!city.equals("")){
             
@@ -33,11 +36,19 @@ public class Main {
             
             var client = HttpClient.newHttpClient();
             HttpResponse.BodyHandler<String> asString = HttpResponse.BodyHandlers.ofString();
+            HttpResponse.BodyHandler<Path> asJSON = HttpResponse.BodyHandlers.ofFile(outlet);
+            
             HttpResponse<String> response = client.send(request, asString);
+            HttpResponse<Path> jresponse = client.send(request, asJSON);
             
             //        int statusCode = response.statusCode();
             //        System.out.printf("Status Code: %s%n", statusCode);
             
+            
+            System.out.println(jresponse.body());
+
+
+
 
             String[] shrimp = response.body().split("[\\{\\}]");
             String[] krill = shrimp[3].split(",");
@@ -53,14 +64,18 @@ public class Main {
                 .GET()
                 .build();
 
-            response = client.send(request, asString);
-            String[] fish = response.body().split(",");
-
-
-            for (String bone : fish) {
-                if (bone.contains("description") || bone.contains("temp\"")) {
-                    System.out.println(bone);
+            if (path) {
+                response = client.send(request, asString);
+                String[] fish = response.body().split(",");
+    
+    
+                for (String bone : fish) {
+                    if (bone.contains("description") || bone.contains("temp\"")) {
+                        System.out.println(bone);
+                    }
                 }
+            } else {
+                jresponse = client.send(request, asJSON);
             }
 
 
