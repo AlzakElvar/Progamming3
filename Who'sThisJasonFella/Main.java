@@ -4,6 +4,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import java.util.Scanner;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -34,7 +35,7 @@ public class Main {
             .GET()
             .build();
             
-            var client = HttpClient.newHttpClient();
+            HttpClient client = HttpClient.newHttpClient();
             HttpResponse.BodyHandler<String> asString = HttpResponse.BodyHandlers.ofString();
             HttpResponse.BodyHandler<Path> asJSON = HttpResponse.BodyHandlers.ofFile(outlet);
             
@@ -46,9 +47,6 @@ public class Main {
             
             
             System.out.println(jresponse.body());
-
-
-
 
             String[] shrimp = response.body().split("[\\{\\}]");
             String[] krill = shrimp[3].split(",");
@@ -86,3 +84,13 @@ public class Main {
         scanner.close();
     }
 }
+
+
+// class weatherResponse {
+//     String name = "";
+//     String local_names = "";
+//     int lat = 0;
+//     int lon = 0;
+//     String country = "";
+//     String state = "";
+// }
